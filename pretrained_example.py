@@ -10,6 +10,7 @@
 import os
 import pickle
 import sys
+import argparse
 
 sys.path.append('./stylegan')
 
@@ -19,7 +20,15 @@ import dnnlib
 import dnnlib.tflib as tflib
 import config
 
+def get_args():
+    p = argparse.ArgumentParser()
+    p.add_argument('--init-rand', '-r', default=5, type=int)
+    p.add_argument('--output', '-o', default='example.png')
+    args = p.parse_args()
+    return args
+
 def main():
+    args = get_args()
     # Initialize TensorFlow.
     tflib.init_tf()
 
@@ -36,7 +45,7 @@ def main():
     Gs.print_layers()
 
     # Pick latent vector.
-    rnd = np.random.RandomState(5)
+    rnd = np.random.RandomState(args.init_rand)
     latents = rnd.randn(1, Gs.input_shape[1])
 
     # Generate image.
@@ -45,7 +54,7 @@ def main():
 
     # Save image.
     os.makedirs(config.result_dir, exist_ok=True)
-    png_filename = os.path.join(config.result_dir, 'example.png')
+    png_filename = os.path.join(config.result_dir, args.output)
     PIL.Image.fromarray(images[0], 'RGB').save(png_filename)
 
 if __name__ == "__main__":
